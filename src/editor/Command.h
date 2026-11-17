@@ -29,6 +29,7 @@ public:
 	vector<Entity*> newEntData;
 
 	EditEntitiesCommand(string desc, vector<EntityState>& oldEntData);
+	EditEntitiesCommand(string desc, int index, const Entity& before, const Entity& after);
 	~EditEntitiesCommand();
 
 	void execute();

@@ -246,6 +246,7 @@ void Editor::renderLoop() {
 		glfwPollEvents();
 
 		if (isIconified) {
+			pollAi(false);
 			sleepms(50);
 			continue;
 		}
@@ -285,6 +286,9 @@ void Editor::renderLoop() {
 			glViewport(0, 0, windowWidth, windowHeight);
 			drawViewport();
 		}
+
+		// MCP captures read the rendered scene before ImGui draws controls.
+		pollAi(true);
 
 		glActiveTexture(GL_TEXTURE0); // needed even if gui isn't drawn(???)
 
@@ -331,6 +335,7 @@ void Editor::renderLoop() {
 		}
 	}
 
+	aiSession.stop();
 	glfwTerminate();
 }
 

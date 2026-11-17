@@ -31,7 +31,7 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #endif
 
-#ifdef __cpp_lib_filesystem
+#if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
 #include <filesystem>
 namespace fs = std::filesystem;
 #define USE_FILESYSTEM

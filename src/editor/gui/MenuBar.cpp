@@ -49,6 +49,8 @@ void MenuBar::draw() {
 
 
 	string fpsText = to_string((int)ImGui::GetIO().Framerate) + " FPS";
+	if (app->aiSession.active())
+		fpsText = (app->aiEditsEnabled ? "MCP edit  |  " : "MCP read  |  ") + fpsText;
 	string statsText = fpsText;
 	string wpolyText;
 	ImVec4 wpolyColor = ImVec4(1, 1, 1, 1);
@@ -1398,6 +1400,20 @@ void MenuBar::drawCreateMenu() {
 void MenuBar::drawToolsMenu() {
 	if (ImGui::BeginMenu("Tools"))
 	{
+		if (ImGui::BeginMenu("AI Integration (MCP)")) {
+			if (ImGui::MenuItem("Enable connection", nullptr, app->aiSession.active())) {
+				app->aiEditsEnabled = false;
+				if (app->aiSession.active()) {
+					app->aiSession.stop();
+					logf("AI connection disabled.\n");
+				}
+				else
+					app->enableAi(false);
+			}
+			ImGui::MenuItem("Allow map edits", nullptr, &app->aiEditsEnabled, app->aiSession.active());
+			tooltip("Permits undoable edits to the open map. Save changes using the File menu.");
+			ImGui::EndMenu();
+		}
 		ImGui::BeginDisabled(app->emptyMapLoaded);
 		Bsp* map = app->mapRenderer->map;
 

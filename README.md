@@ -41,6 +41,14 @@ Shared clipnode branches are copied before editing, so deleting one occurrence
 does not alter other volumes or models sharing the same clipnodes. A compiled
 obstacle may span several volumes; select every part you intend to remove.
 
+### AI integration (MCP)
+
+Use **Tools → AI Integration (MCP)** to connect a local MCP client to the BSP
+currently open in the editor. The client can inspect entities and geometry,
+select entities in the viewport, and make undoable entity edits when enabled.
+Builds include a companion `bspguy-mcp` executable. See the
+[MCP setup and tool reference](docs/mcp.md).
+
 ## System Requirements
 - OpenGL 2.1
 - Windows XP or later / Any flavor of Linux (AFAIK)

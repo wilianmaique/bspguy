@@ -183,8 +183,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 #endif
 
-void start_viewer(const char* map) {
-	Editor renderer = Editor();
+int start_viewer(const char* map, bool enableAi = false, bool allowEdits = false) {
+	Editor renderer;
 
 	Bsp* bsp = NULL;
 
@@ -192,7 +192,7 @@ void start_viewer(const char* map) {
 		bsp = new Bsp(map);
 		if (!bsp->valid) {
 			delete bsp;
-			return;
+			return 1;
 		}
 	}
 
@@ -205,7 +205,10 @@ void start_viewer(const char* map) {
 		renderer.addMap(bsp);
 	}
 	
+	if (enableAi && !renderer.enableAi(allowEdits))
+		return 1;
 	renderer.renderLoop();
+	return 0;
 }
 
 int test() {
@@ -841,6 +844,14 @@ int main(int argc, char* argv[])
 	//return test();
 
 	init_limits();
+
+	if (argc >= 2 && (std::string(argv[1]) == "--ai" || std::string(argv[1]) == "--ai-edit")) {
+		if (argc > 3) {
+			errorf("Usage: bspguy --ai|--ai-edit [map.bsp]\n");
+			return 1;
+		}
+		return start_viewer(argc == 3 ? argv[2] : nullptr, true, std::string(argv[1]) == "--ai-edit");
+	}
 
 	CommandLine cli(argc, argv);
 

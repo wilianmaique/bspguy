@@ -811,6 +811,8 @@ Frustum Editor::getPickFrustum() {
 }
 
 void Editor::addMap(Bsp* map) {
+	++aiMapGeneration;
+	aiRevision = 0;
 	g_settings.addRecentFile(map->path);
 	g_settings.save(); // in case the program crashes
 
@@ -1659,6 +1661,7 @@ void Editor::pushModelUndoState(string actionDesc, int targetLumps) {
 }
 
 void Editor::pushUndoCommand(Command* cmd) {
+	++aiRevision;
 	undoHistory.push_back(cmd);
 	clearRedoCommands();
 
@@ -1684,6 +1687,7 @@ void Editor::undo() {
 	undoCommand->undo();
 	undoHistory.pop_back();
 	redoHistory.push_back(undoCommand);
+	++aiRevision;
 }
 
 void Editor::redo() {
@@ -1700,6 +1704,7 @@ void Editor::redo() {
 	redoCommand->execute();
 	redoHistory.pop_back();
 	undoHistory.push_back(redoCommand);
+	++aiRevision;
 }
 
 void Editor::clearUndoCommands() {

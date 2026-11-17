@@ -47,6 +47,14 @@ EditEntitiesCommand::EditEntitiesCommand(string desc, vector<EntityState>& oldEn
 	this->allowedDuringLoad = true;
 }
 
+EditEntitiesCommand::EditEntitiesCommand(string desc, int index, const Entity& before, const Entity& after)
+	: Command(desc), entIndexes(1, index), oldEntData(1), newEntData(1) {
+	std::unique_ptr<Entity> oldEntity(new Entity(before));
+	newEntData[0] = new Entity(after);
+	oldEntData[0] = oldEntity.release();
+	allowedDuringLoad = true;
+}
+
 EditEntitiesCommand::~EditEntitiesCommand() {
 	for (int i = 0; i < newEntData.size(); i++) {
 		delete oldEntData[i];
@@ -88,12 +96,13 @@ Entity* EditEntitiesCommand::getEntForIndex(int idx) {
 }
 
 void EditEntitiesCommand::refresh() {
-	BspRenderer* renderer = getBspRenderer();
-	
+	getBspRenderer()->preRenderEnts(); // in case a point entity lost/gained a model
+	g_app->gui->entityReportFilterNeeded = true;
+	g_app->updateSelectionSize();
 	g_app->updateEntConnections();
+	g_app->updateEntDirectionVectors();
 	g_app->updateEntityUndoState();
 	g_app->pickCount++; // force GUI update
-	g_app->mapRenderer->preRenderEnts(); // in case a point entity lost/gained a model
 }
 
 int EditEntitiesCommand::memoryUsage() {

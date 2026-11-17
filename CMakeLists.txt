@@ -110,6 +110,8 @@ set(SOURCE_FILES
 	src/editor/AppSettings.h		src/editor/AppSettings.cpp
 	src/editor/PickInfo.h			src/editor/PickInfo.cpp
 	
+	src/ai/EditorApi.cpp
+
 	# 3D viewport
 	src/editor/viewport/BspRenderer.h		src/editor/viewport/BspRenderer.cpp
 											src/editor/viewport/BspRenderer_collision.cpp
@@ -487,4 +489,24 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-type -fno-omit-frame-pointer -std=c++11")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG_MODE -g -O0")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+endif()
+
+add_library(bspguy-ai STATIC src/ai/LocalSession.cpp src/ai/Tools.cpp)
+target_include_directories(bspguy-ai PUBLIC src/ai)
+target_link_libraries(${PROJECT_NAME} bspguy-ai)
+
+add_executable(bspguy-mcp src/ai/McpMain.cpp)
+target_link_libraries(bspguy-mcp bspguy-ai)
+if (WIN32)
+	target_link_libraries(bspguy-ai PUBLIC ws2_32 advapi32 shell32)
+endif()
+if (MSVC)
+	# The MCP host launches this executable with stdin/stdout pipes.
+	set_target_properties(bspguy-mcp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
+endif()
+
+if (MSVC_VERSION GREATER 1949)
+	# VS 2026 removed experimental/filesystem. Keep the C++17 requirement
+	# confined to the translation unit using the standard filesystem library.
+	set_source_files_properties(src/util/util.cpp PROPERTIES COMPILE_FLAGS "/std:c++17 /D_HAS_STD_BYTE=0")
 endif()

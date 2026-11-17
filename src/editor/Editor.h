@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <future>
 #include "PickInfo.h"
+#include "LocalSession.h"
 
 class Gui;
 class Fgd;
@@ -24,6 +25,7 @@ class BaseRenderer;
 class NavRenderer;
 class NavMesh;
 class FrameBuffer;
+class EditorApi;
 
 enum transform_modes {
 	TRANSFORM_NONE = -1,
@@ -94,6 +96,7 @@ class Editor {
 	friend class BspRenderer;
 	friend class SprRenderer;
 	friend class PickInfo;
+	friend class EditorApi;
 
 public:
 	BspRenderer* mapRenderer;
@@ -175,6 +178,7 @@ public:
 	void addMap(Bsp* map);
 
 	void renderLoop();
+	bool enableAi(bool allowEdits);
 	void postLoadFgdsAndTextures();
 	void postLoadFgds();
 	void reloadMaps();
@@ -195,6 +199,11 @@ public:
 	bool autoSelectEngine(Bsp* map, bool reloadIfChanged); // returns true if changed
 
 private:
+	bspai::LocalSession aiSession;
+	uint64_t aiMapGeneration = 0;
+	uint64_t aiRevision = 0;
+	bool aiEditsEnabled = false;
+	void pollAi(bool viewportReady);
 	GLFWwindow* window;
 	FrameBuffer* viewportFbo = NULL; // for viewport scaling
 	float viewportScale = 1.0f; // for viewport scaling
